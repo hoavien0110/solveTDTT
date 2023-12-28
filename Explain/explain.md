@@ -1,0 +1,1 @@
+### folder này được dùng để giải thích code của thư mục solve
