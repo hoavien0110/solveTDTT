@@ -6,4 +6,4 @@
 
 ## 2. Quy tắc
 - Đặt tên file code: Đặt theo code_bai<mã bài>.cpp để dễ tìm file hơn. Ví dụ: code_bai01.cpp, ..., code_bai20.cpp.
-- Đặt tên file giải thích: gt_bai<mã bài>.cpp. Ví dụ: gt_bai01.cpp, ..., git_bai20.cpp.
+- Đặt tên file giải thích: gt_bai<mã bài>.cpp. Ví dụ: gt_bai01.cpp, ..., gt_bai20.cpp.
