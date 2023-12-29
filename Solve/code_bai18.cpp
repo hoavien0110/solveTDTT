@@ -4,95 +4,106 @@
 #include <fstream>
 #include <queue>
 #include <algorithm>
+#include <map>
 
 using namespace std;
 
-void readData(string filein, int &num, vector<int> &arr)
-{
-    ifstream inp(filein.c_str());
-
-    inp >> num;
-
-    arr.resize(num);
-    for (int i = 0; i < num; i++)
-        inp >> arr[i];
-
-    inp.close();
-}
-
-// create a class contain: step and arr
-struct Node
-{
+struct Status {
+    string permutation;
     int step;
-    vector<int> arr;
-
-    Node(int step, vector<int> arr)
-    {
-        this->step = step;
-        this->arr = arr;
-    }
 };
 
-struct cmp
-{
-    bool operator()(Node a, Node b)
-    {
+struct cmp {
+    bool operator()(const Status &a, const Status &b) {
         return a.step > b.step;
     }
 };
 
-bool isTarget(vector<int> arr)
-{
-    for (int i = 0; i < arr.size(); i++)
-        if (arr[i] != i + 1)
+void readData(string filein, int &n, string &permutation) {
+    ifstream inp(filein.c_str());
+
+    inp >> n;
+
+    // read n 1-digit-numbers and convert to string
+    int x;
+    for (int i = 0; i < n; i++) {
+        inp >> x;
+        permutation += (x + '0');
+    }
+    
+    inp.close();
+}
+
+bool isTarget(string permutation) {
+    for (int i = 0; i < permutation.length() - 1; i++) {
+        if (permutation[i] > permutation[i + 1]) {
             return false;
+        }
+    }
+
     return true;
 }
 
-int bfs(int num, vector<int> arr)
-{
-    priority_queue<Node, vector<Node>, cmp> status;
+string newPermutation(string permutation, int i) {
+    string newPermutation = "";
 
-    status.push(Node(0, arr));
+    for (int j = i; j >= 0; j--) {
+        newPermutation += permutation[j];
+    }
 
-    while (!status.empty())
-    {
-        Node node = status.top();
-        status.pop();
+    for (int j = i + 1; j < permutation.length(); j++) {
+        newPermutation += permutation[j];
+    }
 
-        if (isTarget(node.arr))
-            return node.step;
+    return newPermutation;
+}
 
-        for (int i = 1; i < node.arr.size(); i++)
-        {
-            vector<int> temp = node.arr;
-            // reverse from first to i
-            reverse(temp.begin(), temp.begin() + i + 1);
-            status.push(Node(node.step + 1, temp));
+int bfs(int n, string permutation) {
+    priority_queue<Status, vector<Status>, cmp> q;
+    map<string, bool> checked;
+
+    q.push({permutation, 0});
+    checked[permutation] = true;
+
+    while (!q.empty()) {
+        Status u = q.top();
+        q.pop();
+
+        if (isTarget(u.permutation)) {
+            return u.step;
+        }
+
+        for (int i = 1; i < n; i++) {
+            string v = newPermutation(u.permutation, i);
+
+            if (!checked[v]) {
+                q.push({v, u.step + 1});
+                checked[v] = true;
+            }
         }
     }
+
     return -1;
 }
 
-void printAns(string fileout, int ans)
-{
+void printAns(string fileout, int ans) {
     ofstream out(fileout.c_str());
 
     out << ans;
-
+    
     out.close();
 }
 
-int main()
-{
+int main() {
     string filein = "bai18.inp";
     string fileout = "bai18.out";
 
-    int num;
-    vector<int> arr;
+    int n;
+    string permutation;
 
-    readData(filein, num, arr);
-    int ans = bfs(num, arr);
+    readData(filein, n, permutation);
+    int ans = bfs(n, permutation);
     printAns(fileout, ans);
+
     return 0;
 }
