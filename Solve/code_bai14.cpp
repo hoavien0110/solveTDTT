@@ -14,20 +14,47 @@ Contains 2 integers which are the ordinal numbers of the 2 selected peaks.
 using namespace std;
 
 struct Point {
-    int x, y, index;
+    int x, y;
 };
 
-double area(vector<Point> a) {
+double calculateArea(vector<Point> a) {
     double s = 0;
     for (int i = 0; i < a.size(); ++i) {
-        s += a[i].x * a[(i + 1) % a.size()].y - a[i].y * a[(i + 1) % a.size()].x;
+        s += (a[i].x - a[(i + 1) % a.size()].x) * (a[i].y + a[(i + 1) % a.size()].y);
     }
-
     return abs(s) / 2;
 }
 
 double triangleArea(Point a, Point b, Point c) {
     return abs((b.x - a.x) * (b.y + a.y) + (c.x - b.x) * (c.y + b.y) + (a.x - c.x) * (a.y + c.y)) / 2.0;
+}
+
+void solve(int n, vector<Point> a) {
+    double bigArea = calculateArea(a);
+    int j = 1;
+    int firstPoint = 0, secondPoint = 0;
+    double diff = std::numeric_limits<double>::infinity();
+    double currentArea = 0;
+
+    for (int i = 0; i < n; i++) {
+        while (bigArea - 2 * currentArea > 0)
+        {
+            if (abs(bigArea - 2 * currentArea) < diff) {
+                diff = abs(bigArea - 2 * currentArea);
+                firstPoint = i;
+                secondPoint = j;
+            }
+            currentArea += triangleArea(a[i], a[j], a[(j + 1) % n]);
+            j = (j + 1) % n;
+        }
+        if (abs(bigArea - 2 * currentArea) < diff) {
+            diff = abs(bigArea - 2 * currentArea);
+            firstPoint = i;
+            secondPoint = j;
+        }
+        currentArea -= triangleArea(a[i], a[(i + 1) % n], a[j]);
+    }
+    cout << firstPoint + 1 << " " << secondPoint + 1 << endl;
 }
 
 int main() {
@@ -36,21 +63,9 @@ int main() {
     vector<Point> a(n);
     for (int i = 0; i < n; ++i) {
         cin >> a[i].x >> a[i].y;
-        a[i].index = i + 1;
     }
+    solve(n, a);
+    // cout << calculateArea(a) << endl;
 
-    double minArea = 1e9;
-    int index1, index2;
-    for (int i = 0; i < n; ++i) {
-        double area1 = triangleArea(a[i], a[(i + 1) % n], a[(i + 2) % n]);
-        double area2 = area(a) - area1;
-        if (abs(area1 - area2) < minArea) {
-            minArea = abs(area1 - area2);
-            index1 = a[i].index;
-            index2 = a[(i + 2) % n].index;
-        }
-    }
-
-    cout << index1 << " " << index2;
     return 0;
 }
