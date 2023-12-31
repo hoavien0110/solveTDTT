@@ -30,3 +30,27 @@ double triangleArea(Point a, Point b, Point c) {
     return abs((b.x - a.x) * (b.y + a.y) + (c.x - b.x) * (c.y + b.y) + (a.x - c.x) * (a.y + c.y)) / 2.0;
 }
 
+int main() {
+    int n;
+    cin >> n;
+    vector<Point> a(n);
+    for (int i = 0; i < n; ++i) {
+        cin >> a[i].x >> a[i].y;
+        a[i].index = i + 1;
+    }
+
+    double minArea = 1e9;
+    int index1, index2;
+    for (int i = 0; i < n; ++i) {
+        double area1 = triangleArea(a[i], a[(i + 1) % n], a[(i + 2) % n]);
+        double area2 = area(a) - area1;
+        if (abs(area1 - area2) < minArea) {
+            minArea = abs(area1 - area2);
+            index1 = a[i].index;
+            index2 = a[(i + 2) % n].index;
+        }
+    }
+
+    cout << index1 << " " << index2;
+    return 0;
+}
