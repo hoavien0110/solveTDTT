@@ -143,3 +143,41 @@ int main()
 
     return 0;
 }
+
+/*
+GIẢI THÍCH Ở ĐÂY NÈ
+
+source = mis*is*p*.
+normalize: 
++ đưa chỉ số bắt đầu từ 1
++ destination = mississippi
++ source = misisp.
++ mask = [0, 0, 1, 0, 1, 1, 0]
+
+F[i][j]: có thể biến đổi xâu source[1..i] thành 
+            xâu destination[1..j] hay không? (true/false)
+
+Cơ sở:
+F[0][0]: true
+F[i][0]: source có i kí tự, destination có 0 kí tự -> false
+F[0][j]: source có 0 kí tự, destination có j kí tự
+    + nếu mask[j] = 1 -> F[0][j] = F[0][j-1]
+    + nếu mask[j] = 0 -> F[0][j] = false
+
+Công thức đệ quy:
++ TH1: source[i] = '.' 
+    -> cho kí tự i của source bằng kí tự j của destination
+    F[i][j] = F[i-1][j-1]
++ TH2: source[i] = 'a' -> 'z' (mask[i] = 0)
+    + 2.1: nếu source[i] = destination[j] -> F[i][j] = F[i-1][j-1]
+    + 2.2: nếu source[i] != destination[j] -> F[i][j] = false
+    -> F[i][j] = (source[i] == destination[j]) && F[i-1][j-1]
++ TH3: source[i] = '*' (mask[i] = 1)
+    + 3.1: không dùng source[i] -> F[i][j] = F[i-1][j]
+    + 3.2: dùng source[i] -> F[i][j] = (source[i] == destination[j]) && F[i][j-1]
+    -> F[i][j] = F[i-1][j] || (source[i] == destination[j]) && F[i][j-1]
+
+Độ phức tạp:
++ Không gian: O(n*m) // n: độ dài source, m: độ dài destination
++ Thời gian: O(n*m) // n: độ dài source, m: độ dài destination
+*/
