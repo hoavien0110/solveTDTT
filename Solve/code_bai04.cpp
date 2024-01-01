@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstdio>
+#include <fstream>
+
 using namespace std;
 
 // 0 <= a[i] < = 60000
@@ -23,15 +25,28 @@ void update(int x)
 
 int main()
 {
+    string filein = "bai04.inp";
+    string fileout = "bai04.out";
+
     // n: số lượng phần tử
     // x: giá trị của phần tử
     int n,x,ans=0;
-    cin >> n;
+
+    ifstream inp(filein);
+
+    inp >> n;
     while (n--)
     {
-        scanf("%d",&x);
+        inp >> x;
         ans += query(x);
         update(x);
     }
-    cout << ans << endl;
+
+    inp.close();
+
+    ofstream out(fileout);
+
+    out << ans;
+
+    out.close();
 }
