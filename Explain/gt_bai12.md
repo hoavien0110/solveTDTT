@@ -18,6 +18,6 @@ Hãy chỉ ra cách xây dựng một hình vuông có diện tích là số ngu
 
 ### 3. Độ phức tạp
 - Thời gian:
-    - Tìm kiếm: đặt n = 32 -> $O(n \log{n})$
+    - Tìm kiếm: đặt n = 32 -> $O(n \log{n})$ hay $O(\sqrt{S} \log{\sqrt{S}})$
 - Không gian:
-    - Xây dựng vector -> $O(n)$
+    - Xây dựng vector -> $O(n)$ hay $O(\sqrt{S})$
