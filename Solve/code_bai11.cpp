@@ -73,3 +73,41 @@ int main() {
 
     return 0;
 }
+
+/*
+GIẢI THÍCH CODE Ở ĐÂY NÈ
+
+Tóm tắt đề:
+K cụm dữ liệu, mỗi cụm có 2 giá trị (a, b) 
+    tương ứng khi nó thuộc về nhóm A thì giá trị a tăng, thuộc nhóm B thì giá trị b tăng
+2 nhóm A, B
+nhóm A có tối đa N cụm dữ liệu
+nhóm B có tối đa M cụm dữ liệu
+
+Hướng giải quyết
+F[i][j][k]: với i cụm dữ liệu đầu tiên, j nhóm A, k nhóm B
+    + 0 <= i <= k
+    + 0 <= j <= n
+    + 0 <= k <= m
+
+Cơ sở:
+F[0][0][0] = 0
+
+Công thức đệ quy:
+F[i][j][k]:
+    + không chọn cụm dữ liệu i
+        F[i][j][k] = F[i-1][j][k]
+    + chọn cụm dữ liệu i cho nhóm A
+        F[i][j][k] = F[i-1][j-1][k] + cluster[i].a
+    + chọn cụm dữ liệu i cho nhóm B
+        F[i][j][k] = F[i-1][j][k-1] + cluster[i].b
+=> F[i][j][k] = max(F[i-1][j][k], 
+                    F[i-1][j-1][k] + cluster[i].a, 
+                    F[i-1][j][k-1] + cluster[i].b)
+
+Kết quả cần tìm: F[K][N][M]
+
+Độ phức tạp:
+    + Time complexity: O(KNM)
+    + Space complexity: O(KNM)
+*/

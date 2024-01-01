@@ -80,3 +80,49 @@ int main() {
 
     return 0;
 }
+
+/*
+GIẢI THÍCH CODE Ở ĐÂY NÈ
+
+Tóm tắt đề:
+K cụm dữ liệu, mỗi cụm có 2 giá trị (a, b) 
+    tương ứng khi nó thuộc về nhóm A thì giá trị a tăng, thuộc nhóm B thì giá trị b tăng
+2 nhóm A, B
+nhóm A có tối đa N cụm dữ liệu
+nhóm B có tối đa M cụm dữ liệu
+
+Nhận xét:
++ Sort các cụm dữ liệu theo giá trị a giảm dần
++ Mỗi cluster có thể có 3 trạng thái:
+    + không chọn
+    + chọn cho nhóm A
+    + chọn cho nhóm B
++ Với cluster thứ i, nếu không chọn cho nhóm B
+    và nhóm A vẫn còn slot
+    -> nó chắc chắn sẽ nằm trong nhóm A 
+    (vì đã sort giảm dần theo a)    
+
+Hướng giải quyết
+F[i][j]: với i cụm dữ liệu đầu tiên, j nhóm B
+    + 0 <= i <= K
+    + 0 <= j <= M
+
+Cơ sở:
+F[0][0] = 0
+
+Công thức đệ quy:
+F[i][j]:
+    + chọn cụm dữ liệu i cho nhóm B
+        F[i][j] = F[i-1][j] + cluster[i].b
+    + không chọn cụm dữ liệu i cho nhóm B 
+        + Nếu nhóm A còn slot (i - j <= N)
+            F[i][j] = F[i-1][j] + cluster[i].a
+        + Nếu nhóm A hết slot
+            F[i][j] = F[i-1][j]
+
+Kết quả cần tìm: F[K][M]
+
+Độ phức tạp:
+   + Không gian: O(n*m) // n: số lượng cụm dữ liệu, m: số lượng nhóm B
+    + Thời gian: O(n*m)
+*/
