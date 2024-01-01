@@ -9,7 +9,7 @@ Cho dãy số nguyên a1,a2,…,an. Tìm một đoạn con có đúng k phần t
     - Giá trị lớn nhất của ước chung lớn nhất của k phần tử liên tiếp.
 
 ### 2. Giải thích
-Vì $gcd(x_i, x_j) = gcd(gcd(x_i, x_k), gcd(x_k, x_j))$ nên ta có thể sử dụng segment tree hoặc sparse table
+Vì $gcd(x[i->j]) = gcd(gcd(x[i -> l]), gcd(x[l -> j]))$ nên ta có thể sử dụng segment tree hoặc sparse table
 
 ### 3. Độ phức tạp
 - Sparse table:
