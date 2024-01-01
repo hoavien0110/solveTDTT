@@ -1,29 +1,37 @@
 #include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
-
+#include <cstdio>
 using namespace std;
 
-void readData(string filein, int &num, vector<int> &arr) {
-    ifstream inp(filein.c_str());
+// 0 <= a[i] < = 60000
+int f[60600];
 
-    inp >> num;
-    arr.resize(num + 1);
-    for (int i = 1; i <= num; i++) {
-        inp >> arr[i];
-    }
-    
-    inp.close();
+int query(int x)
+{
+    // tính số phần tử lớn hơn x
+    int ans = 0;
+
+    for (int i=x+1; i<=60000; i+=i&-i) ans += f[i]; // i&-i: lấy bit 1 cuối cùng
+
+    return ans;
 }
 
-int main() {
-    string filein = "bai04.inp";
-    string fileout = "bai04.out";
+void update(int x)
+{
+    // cập nhật số phần tử có giá trị x
+     for (int i=x; i; i-=i&-i) f[i]++;
+}
 
-    int num;
-    vector<int> arr;
-
-    readData(filein, num, arr);
-    return 0;
+int main()
+{
+    // n: số lượng phần tử
+    // x: giá trị của phần tử
+    int n,x,ans=0;
+    cin >> n;
+    while (n--)
+    {
+        scanf("%d",&x);
+        ans += query(x);
+        update(x);
+    }
+    cout << ans << endl;
 }
