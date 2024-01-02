@@ -44,10 +44,12 @@ void solve(string para, string word, vector<int> &ans) {
 
     // find positions
     for (int i = 0; i <= para.size() - word.size(); i++) {
+        // hash of sub para [i..i+word.size()-1]
         long long hashSub = hashPara[i + word.size() - 1];
         if (i > 0)
             hashSub = (hashSub - ((hashPara[i-1] * POW[word.size()]) % MOD) + MOD) % MOD;
 
+        // compare hashSub and hashWord
         if (hashSub == hashWord) {
             bool ok = true;
             for (int j = 0; j < word.size(); j++)
