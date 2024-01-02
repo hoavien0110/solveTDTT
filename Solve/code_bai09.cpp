@@ -69,43 +69,28 @@ bool check(string source, string destination, vector<int> mask)
     { // source
         for (int j = 1; j <= desLen; j++)
         { // destination
-            if (source[i] == '.')
-            {
-                // source[i]  = '.'
-                dp[i][j] = dp[i - 1][j - 1];
-            }
-            else if (mask[i] == 0)
-            {
-                // source[i] in 'a' -> 'z'
-                dp[i][j] = ((dp[i - 1][j - 1]) && (source[i] == destination[j]));
-            }
-            else if (mask[i] == 1)
+            if (mask[i] == 1)
             {
                 // source[i] can occur 0 or more times
                 dp[i][j] = dp[i - 1][j]; // do not use source[i]
-                if (source[i] == destination[j])
+                if (source[i] == destination[j] || source[i] == '.')
                 {
                     dp[i][j] = (dp[i][j]) || (dp[i][j - 1]); // use source[i]
                 }
             }
+            else { // mask[i] = 0
+                if (source[i] == '.')
+                {
+                    // source[i]  = '.'
+                    dp[i][j] = dp[i - 1][j - 1];
+                }
+                else {
+                    // source[i] in 'a' -> 'z' without '*'
+                    dp[i][j] = ((dp[i - 1][j - 1]) && (source[i] == destination[j]));
+                }
+            }
         }
     }
-
-    // cout << "destination: ." << destination << endl;
-    // cout << "source: ." << source << endl;
-    // for (int i = 0; i < mask.size(); i++)
-    // {
-    //     cout << mask[i] << " ";
-    // }
-    // cout << endl;
-    // for (int i = 0; i <= srcLen; i++)
-    // {
-    //     for (int j = 0; j <= desLen; j++)
-    //     {
-    //         cout << dp[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
 
     return dp[srcLen][desLen];
 }
@@ -174,8 +159,8 @@ Công thức đệ quy:
     -> F[i][j] = (source[i] == destination[j]) && F[i-1][j-1]
 + TH3: source[i] = '*' (mask[i] = 1)
     + 3.1: không dùng source[i] -> F[i][j] = F[i-1][j]
-    + 3.2: dùng source[i] -> F[i][j] = (source[i] == destination[j]) && F[i][j-1]
-    -> F[i][j] = F[i-1][j] || (source[i] == destination[j]) && F[i][j-1]
+    + 3.2: dùng source[i] -> F[i][j] = (source[i] == destination[j] || source[i] == '.') && F[i][j-1]
+    -> F[i][j] = F[i-1][j] || (source[i] == destination[j] || source[i] == '.') && F[i][j-1]
 
 Độ phức tạp:
 + Không gian: O(n*m) // n: độ dài source, m: độ dài destination

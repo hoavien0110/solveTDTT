@@ -1,4 +1,4 @@
-// Time: O(n^2); Space: O(n^2)
+// Time: O(n^2); Space: O(n)
 // DFS from each node to find the distance to the root
 #include <iostream>
 #include <vector>
