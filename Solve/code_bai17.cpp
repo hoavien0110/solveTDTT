@@ -1,16 +1,35 @@
 #include <iostream>
-
-#define MAX_NUM_DIGIT 9
-
+#include <queue>
+#define MAX 1000000000
 using namespace std;
 
-int main() {
-    int num;
-    cin >> num;
+int findSmallestMultiple(int n) {
+    queue<int> q;
+    q.push(1);
 
-    for (int i = 1; i <= (1 << MAX_NUM_DIGIT); i++) {
-        // See i in binary as a set of digits
-        
+    while (!q.empty()) {
+        int currentNumber = q.front();
+        q.pop();
+
+        if (currentNumber < MAX && currentNumber % n == 0) {
+            return currentNumber;
+        }
+
+        if (currentNumber < MAX) {
+            q.push(currentNumber * 10);
+            q.push(currentNumber * 10 + 1);
+        }
     }
+
+    return -1;
+}
+
+int main() {
+    int n;
+    cin >> n;
+
+    int smallestMultiple = findSmallestMultiple(n);
+    cout << smallestMultiple << endl;
+
     return 0;
 }
