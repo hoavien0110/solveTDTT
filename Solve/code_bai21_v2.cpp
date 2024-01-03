@@ -1,3 +1,8 @@
+// Sinh tất cả các cây khung của đồ thị
+// Sinh các dãy bit từ 0 -> 2^E - 1 --> O(2^m)
+// Kiểm tra xem dãy bit đó có tạo thành cây khung không --> O(max(m,n))
+// Tổng cộng: O(2^m * max(m,n))
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -45,6 +50,7 @@ void readData(string filename, int &k, Graph &g) {
     inp.close();
 }
 
+// Kiểm tra xem cạnh thứ i có được chọn không
 bool isSelectEdge(int mask, int i) {
     return mask & (1 << i);
 }
@@ -53,7 +59,7 @@ bool isST(Graph g, int mask, vector<int> &selectedEdges, int &cost) {
     int count = 0;
     selectedEdges.clear();
     cost = 0;
-    // check number of selected edges
+    // kiểm tra số cạnh được chọn có bằng V - 1 không
     for (int i = 0; i < g.E; i++) {
         if (isSelectEdge(mask, i)) {
             count++;
@@ -66,7 +72,7 @@ bool isST(Graph g, int mask, vector<int> &selectedEdges, int &cost) {
         return false;
     }
 
-    // check connected
+    // kiểm tra có tạo thành một thành phần liên thông không
     vector<bool> isConnected(g.V + 1, false);
 
     queue<int> q;
@@ -131,6 +137,7 @@ void printAns(string filename, vector<SpanningTree> spanningTrees, int k) {
 
     out.close();
 }
+
 int main() {
     string filein = "bai21.inp";
     string fileout = "bai21.out";
