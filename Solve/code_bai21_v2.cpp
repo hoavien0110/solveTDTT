@@ -1,154 +1,126 @@
-// generate all Spanning Tree of a graph by DFS
-
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include <string>
 
 using namespace std;
 
-// định nghĩa cạnh của đồ thị
 struct Edge {
     int u, v, w;
 };
 
-// định nghĩa cây khung của đồ thị
-struct SpanningTree {
-    int numNodes;
-    int numEdges;
+struct Graph {
+    int V, E;
     vector<Edge> edges;
+};
 
-    // khởi tạo cây khung cho đồ thị có numNodes đỉnh
-    SpanningTree(int numNodes = 0) {
-        this->numNodes = numNodes;
-        numEdges = 0;
-    }
+struct SpanningTree {
+    vector<int> edges;
+    int cost;
 
-    // thêm cạnh (u, v) có trọng số w vào cây khung
-    void addEdge(int u, int v, int w) {
-        edges.push_back({u, v, w});
-        numEdges++;
-    }
-
-    // xóa cạnh cuối cùng của cây khung
-    void removeLastEdge() {
-        edges.pop_back();
-        numEdges--;
-    }
-
-    // xóa tất cả các cạnh của cây khung
-    void clear() {
-        numEdges = 0;
-        edges.clear();
-    }
-
-    // tính tổng trọng số của cây khung
-    int calculateSum() {
-        int sum = 0;
-        for (int i = 0; i < edges.size(); i++) {
-            sum += edges[i].w;
+    SpanningTree(vector<int> edges, int count, int cost) {
+        this->edges.resize(count);
+        for (int i = 0; i < count; i++) {
+            this->edges[i] = edges[i];
         }
-        return sum;
-    }
-
-    // kiểm tra cây khung đã đầy đủ các cạnh chưa
-    bool isFull() {
-        return numEdges == numNodes - 1;
+        this->cost = cost;
     }
 };
 
-void readData(string fileName, int &n, int &m, int &k, vector<vector<pair<int,int>>> &adj)
-{
-    ifstream inp(fileName.c_str());
+void readData(string filename, int &k, Graph &g) {
+    ifstream inp(filename.c_str(), ios::in);
 
-    inp >> n >> m >> k;
+    inp >> g.V >> g.E >> k;
 
-    adj.resize(n + 1);
-    for (int i = 1; i <= m; i++)
-    {
-        int u, v, w;
-        inp >> u >> v >> w;
-        adj[u].push_back({v, w});
-        adj[v].push_back({u, w});
+    for (int i = 0; i < g.E; i++) {
+        Edge e;
+        inp >> e.u >> e.v >> e.w;
+        g.edges.push_back(e);
     }
 
     inp.close();
 }
 
-void generateAllSpanningTrees(int u, SpanningTree &spanningTree, vector<SpanningTree> &spanningTrees, vector<int> &visited, vector<vector<pair<int,int>>> &adj, int &count)
-{
-    if (spanningTree.isFull())
-    {
-        count++;
-        spanningTrees.push_back(spanningTree);
+int checkST(Graph g, vector<int> selectedEdges) {
+    int sz = g.V - 1;
+    int cost = 0;
+
+    for (int i = 0; i < sz; i++) {
+        int w = g.edges[selectedEdges[i]].w;
+        cost += w;
+    }
+
+    return cost;
+}
+
+void selectEdge(Graph g, vector<int> selectedEdges, int count, vector<SpanningTree> &spanningTrees) {
+    cout << "-----------------\n";
+    cout << "count = " << count << endl;
+    for (int i = 0; i < count; i++) {
+        cout << selectedEdges[i] << " ";
+    }
+    cout << endl;
+
+    if (count == g.V - 1) {
+        // đủ số lượng cạnh
+        // for (int i = 0; i < g.V - 1; i++) {
+        //     cout << selectedEdges[i] << " ";
+        // }
+        // cout << endl;
+
+        int cost = checkST(g, selectedEdges);
+        if (cost != -1) {
+            spanningTrees.push_back(SpanningTree(selectedEdges, count, cost));
+        }
         return;
     }
 
-    for (int i = 0; i < adj[u].size(); i++)
-    {
-        int v = adj[u][i].first;
-        int w = adj[u][i].second;
-        if (!visited[v])
-        {
-            visited[v] = 1;
-            spanningTree.addEdge(u, v, w);
-            generateAllSpanningTrees(v, spanningTree, spanningTrees, visited, adj, count);
-            spanningTree.removeLastEdge();
-            visited[v] = 0;
-        }
+    int start = (count == 0) ? 0 : selectedEdges[count - 1] + 1;
+    for (int i = start; i < g.V; i++) {
+        cout << i << endl;
+        selectedEdges[count] = i;
+        selectEdge(g, selectedEdges, count + 1, spanningTrees);
     }
 }
 
-void printAns(string fileout, vector<SpanningTree> spanningTrees, int count)
-{
-    ofstream out(fileout.c_str());
+void printAns(string filename, vector<SpanningTree> spanningTrees, int k) {
+    ofstream out(filename.c_str(), ios::out);
 
-    // out << count << endl;
+    int sz = k < spanningTrees.size() ? k : spanningTrees.size();
+    if (sz == 0) {
+        out << -1;
+    } else {
+        sort(spanningTrees.begin(), spanningTrees.end(), [](SpanningTree a, SpanningTree b) {
+            return a.cost < b.cost;
+        });
 
-    int sz = count < spanningTrees.size() ? count : spanningTrees.size();
-    for (int i = 0; i < sz; i++)
-    {
-        out << "#" << i + 1 << ": " << endl;
-        vector<Edge> edges = spanningTrees[i].edges;
-        for (int j = 0; j < edges.size(); j++)
-        {
-            out << edges[j].u << " " << edges[j].v  << " " << edges[j].w << endl;
+        for (int i = 0; i < sz; i++) {
+            if (spanningTrees[i].cost > k) {
+                break;
+            }
+
+            for (int j = 0; j < spanningTrees[i].edges.size(); j++) {
+                out << spanningTrees[i].edges[j] << " ";
+            }
+            out << endl;
         }
     }
 
     out.close();
 }
-
-int main()
-{
-    string fileName = "bai21.inp";
+int main() {
+    string filein = "bai21.inp";
     string fileout = "bai21.out";
 
-    int n, m, k;
-    vector<vector<pair<int,int>>> adj;
+    Graph g;
+    int k;
+    vector<SpanningTree> spanningTrees;
+    vector<int> selectedEdges;
+    int count = 0; // số cạnh đã chọn
+    selectedEdges.resize(g.V);
 
-    readData(fileName, n, m, k, adj);
-
-    vector<int> visited(n + 1);
-    SpanningTree spanningTree(n); // cây khung cho đồ thị n đỉnh
-    vector<SpanningTree> spanningTrees; // tập hợp các cây khung của đồ thị
-    int count = 0;
-
-    // xây dựng tất cả các cây khung của đồ thị
-    generateAllSpanningTrees(1, spanningTree, spanningTrees, visited, adj, count);
-
-    // sắp xếp các cây khung theo thứ tự tăng dần của tổng trọng số - số cạnh
-    sort(spanningTrees.begin(), spanningTrees.end(), [](SpanningTree a, SpanningTree b) {
-        int sumA = a.calculateSum();
-        int sumB = b.calculateSum();
-
-        if (sumA != sumB)
-            return sumA < sumB;
-        else return a.numEdges < b.numEdges;
-    });
-
-    // in ra k cây khung đầu tiên
+    readData(filein, k , g);
+    selectEdge(g, selectedEdges, count, spanningTrees);
     printAns(fileout, spanningTrees, k);
 
     return 0;
