@@ -6,11 +6,11 @@ using namespace std;
 int findSmallestMultiple(int n) {
     queue<int> q;
     q.push(1);
-
+    int cnt = 0;
     while (!q.empty()) {
         int currentNumber = q.front();
         q.pop();
-
+        cnt++;
         if (currentNumber < MAX && currentNumber % n == 0) {
             return currentNumber;
         }
@@ -20,7 +20,6 @@ int findSmallestMultiple(int n) {
             q.push(currentNumber * 10 + 1);
         }
     }
-
     return -1;
 }
 
