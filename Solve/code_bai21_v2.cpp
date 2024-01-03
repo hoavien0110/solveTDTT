@@ -2,18 +2,22 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 using namespace std;
 
+// Cấu trúc cạnh
 struct Edge {
     int u, v, w;
 };
 
+// Cấu trúc đồ thị
 struct Graph {
     int V, E;
     vector<Edge> edges;
 };
 
+// Cấu trúc cây khung
 struct SpanningTree {
     vector<int> edges;
     int cost;
@@ -41,53 +45,75 @@ void readData(string filename, int &k, Graph &g) {
     inp.close();
 }
 
-int checkST(Graph g, vector<int> selectedEdges) {
-    int sz = g.V - 1;
-    int cost = 0;
-
-    for (int i = 0; i < sz; i++) {
-        int w = g.edges[selectedEdges[i]].w;
-        cost += w;
-    }
-
-    return cost;
+bool isSelectEdge(int mask, int i) {
+    return mask & (1 << i);
 }
 
-void selectEdge(Graph g, vector<int> selectedEdges, int count, vector<SpanningTree> &spanningTrees) {
-    cout << "-----------------\n";
-    cout << "count = " << count << endl;
-    for (int i = 0; i < count; i++) {
-        cout << selectedEdges[i] << " ";
-    }
-    cout << endl;
-
-    if (count == g.V - 1) {
-        // đủ số lượng cạnh
-        // for (int i = 0; i < g.V - 1; i++) {
-        //     cout << selectedEdges[i] << " ";
-        // }
-        // cout << endl;
-
-        int cost = checkST(g, selectedEdges);
-        if (cost != -1) {
-            spanningTrees.push_back(SpanningTree(selectedEdges, count, cost));
+bool isST(Graph g, int mask, vector<int> &selectedEdges, int &cost) {
+    int count = 0;
+    selectedEdges.clear();
+    cost = 0;
+    // check number of selected edges
+    for (int i = 0; i < g.E; i++) {
+        if (isSelectEdge(mask, i)) {
+            count++;
+            cost += g.edges[i].w;
+            selectedEdges.push_back(i);
         }
-        return;
     }
 
-    int start = (count == 0) ? 0 : selectedEdges[count - 1] + 1;
-    for (int i = start; i < g.V; i++) {
-        cout << i << endl;
-        selectedEdges[count] = i;
-        selectEdge(g, selectedEdges, count + 1, spanningTrees);
+    if (count != g.V - 1) {
+        return false;
+    }
+
+    // check connected
+    vector<bool> isConnected(g.V + 1, false);
+
+    queue<int> q;
+
+    q.push(g.edges[selectedEdges[0]].u);
+    isConnected[g.edges[selectedEdges[0]].u] = true;
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+
+        for (int i = 0; i < selectedEdges.size(); i++) {
+            int v = g.edges[selectedEdges[i]].v;
+            if (g.edges[selectedEdges[i]].u == u && !isConnected[v]) {
+                isConnected[v] = true;
+                q.push(v);
+            }
+        }
+    }
+
+    for (int i = 1; i <= g.V; i++) {
+        if (!isConnected[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// Chọn các cạnh và kiểm tra có tạo thành cây khung không
+void selectEdge(Graph g, vector<SpanningTree> &spanningTrees) {
+    for (int mask = 0; mask < (1 << g.E); mask++) {
+        int cost = 0;
+        vector<int> selectedEdges;
+        if (isST(g, mask, selectedEdges, cost) == true) {
+            // add spanning tree
+            spanningTrees.push_back(SpanningTree(selectedEdges, g.V - 1, cost));
+        }
     }
 }
 
+// in ra k cây khung nhỏ nhất
 void printAns(string filename, vector<SpanningTree> spanningTrees, int k) {
     ofstream out(filename.c_str(), ios::out);
 
     int sz = k < spanningTrees.size() ? k : spanningTrees.size();
-    if (sz == 0) {
+    if (sz <= 0) {
         out << -1;
     } else {
         sort(spanningTrees.begin(), spanningTrees.end(), [](SpanningTree a, SpanningTree b) {
@@ -95,12 +121,9 @@ void printAns(string filename, vector<SpanningTree> spanningTrees, int k) {
         });
 
         for (int i = 0; i < sz; i++) {
-            if (spanningTrees[i].cost > k) {
-                break;
-            }
-
+            out << "#" << i + 1 << ": " << spanningTrees[i].cost << endl;
             for (int j = 0; j < spanningTrees[i].edges.size(); j++) {
-                out << spanningTrees[i].edges[j] << " ";
+                out << spanningTrees[i].edges[j] + 1 << " ";
             }
             out << endl;
         }
@@ -115,12 +138,9 @@ int main() {
     Graph g;
     int k;
     vector<SpanningTree> spanningTrees;
-    vector<int> selectedEdges;
-    int count = 0; // số cạnh đã chọn
-    selectedEdges.resize(g.V);
 
     readData(filein, k , g);
-    selectEdge(g, selectedEdges, count, spanningTrees);
+    selectEdge(g, spanningTrees);
     printAns(fileout, spanningTrees, k);
 
     return 0;
