@@ -46,8 +46,10 @@ int main() {
 
     for (int k = 0; k < m; k++) {
         int l = binarySearch(b, -a[k].first);
+        // số lớn nhất nhỏ hơn hoặc bằng -a[k].first
 
         if (l < n) {
+            // xét số vừa tìm được
             int currentSum = abs(a[k].first + b[l].first);
             if (currentSum < minSum) {
                 i = a[k].second;
@@ -57,6 +59,7 @@ int main() {
         }
 
         if (l > 0) {
+            // xét số nhỏ hơn số vừa tìm được
             int currentSum = abs(a[k].first + b[l - 1].first);
             if (currentSum < minSum) {
                 i = a[k].second;

@@ -3,6 +3,8 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <string>
+
 using namespace std;
 
 void solve(int n)
